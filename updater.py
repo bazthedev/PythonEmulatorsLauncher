@@ -11,7 +11,7 @@ def reset_config():
         aupd = False
     with open("config.json", "w") as f:
         conf = {}
-        conf["version"] = "0.0.2"
+        conf["version"] = "0.0.0"
         conf["romdir"] = "./roms"
         conf["autoupd"] = aupd
         conf["foundroms"] = []
