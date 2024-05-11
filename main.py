@@ -2,8 +2,12 @@ from emulators.runnes import run_nes_emu as rne
 from emulators.rungb import run_gb_emu as rge
 from emulators.runnds import run_nds_emu as rndse
 
+import requests
 import os
 import json
+
+
+
 
 def clear_scr():
     os.system("cls")
@@ -35,6 +39,8 @@ with open("config.json", "r") as f:
         config = json.load(f)
         loaded_config = True
     
+if not os.path.exists("./roms") and config["romdir"] == "./roms":
+    os.mkdir("./roms")
 
 romdir = config["romdir"]
 
@@ -208,7 +214,11 @@ while running == True:
     elif choice.lower() == "s":
         print("Current settings:")
     elif choice.lower() == "u":
-        pass #update app
+        if not os.path.exists("./updater.py"):
+            updater = requests.get("https://raw.githubusercontent.com/bazthedev/PythonEmulatorsLauncher/main/updater.py")
+            with open("./updater.py", "wb") as f:
+                f.write(updater.content)
+                f.close()
     elif choice.lower() == "x":
         print("Exitting...")
         break
