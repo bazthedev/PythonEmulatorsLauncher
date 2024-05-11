@@ -1,1 +1,1 @@
-# PythonEmulatorsFrontend
+# PythonEmulatorsLauncher
