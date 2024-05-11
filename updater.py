@@ -3,8 +3,30 @@ import zipfile
 import json
 import os
 
-with open("./config.json", "r") as f:
-    config = json.load(f)
+def reset_config():
+    autoupd = input("Would you like to enable automatic updates? (y/n)")
+    if autoupd[0].lower() == "y":
+        aupd = True
+    else:
+        aupd = False
+    with open("config.json", "w") as f:
+        conf = {}
+        conf["version"] = "0.0.2"
+        conf["romdir"] = "./roms"
+        conf["autoupd"] = aupd
+        conf["foundroms"] = []
+        conf["foundnesroms"] = []
+        conf["foundgbroms"] = []
+        conf["foundgbcroms"] = []
+        conf["foundndsroms"] = []
+        conf["foundn64roms"] = []
+        json.dump(conf, f, indent=4)
+
+try:
+    with open("./config.json", "r") as f:
+        config = json.load(f)
+except Exception:
+    reset_config()
 
 cver = config["version"]
 
@@ -41,6 +63,9 @@ def update(version : str):
         config["version"] = version
         with open("./config.json", "w") as f:
             json.dump(config, f, indent=4)
+        print("Installing new packages...")
+        os.system("py -m pip install -r requirements.txt")
+        print("Installed (if failed, open cmd in this directory and run py -m pip install -r requirements.txt)")
         print("Cleaning up...")
         os.remove(f"./PEL_{version}.zip")
         print("Successfully updated!")
