@@ -2,6 +2,8 @@ from emulators.runnes import run_nes_emu as rne
 from emulators.rungb import run_gb_emu as rge
 from emulators.runnds import run_nds_emu as rndse
 
+
+
 import requests
 import os
 import json
@@ -20,7 +22,7 @@ def reset_config():
         aupd = False
     with open("config.json", "w") as f:
         conf = {}
-        conf["version"] = "0.0.1"
+        conf["version"] = "0.0.2"
         conf["romdir"] = "./roms"
         conf["autoupd"] = aupd
         conf["foundroms"] = []
@@ -34,6 +36,7 @@ def reset_config():
 if not os.path.exists("./config.json"):
     reset_config()
 
+from updater import check_update
 
 with open("config.json", "r") as f:
         config = json.load(f)
@@ -41,6 +44,16 @@ with open("config.json", "r") as f:
     
 if not os.path.exists("./roms") and config["romdir"] == "./roms":
     os.mkdir("./roms")
+
+if not os.path.exists("./updater.py"):
+            updater = requests.get("https://raw.githubusercontent.com/bazthedev/PythonEmulatorsLauncher/main/updater.py")
+            with open("./updater.py", "wb") as f:
+                f.write(updater.content)
+                f.close()
+
+
+if config["autoupd"] and check_update():
+        print("Update found, please run updater.py")
 
 romdir = config["romdir"]
 
@@ -58,9 +71,11 @@ def findroms():
 
             if rom.endswith(".nes") or rom.endswith(".gb") or rom.endswith(".gbc") or rom.endswith(".nds") or rom.endswith(".z64"):
                 found_roms.append(str(rom))
-            
+            elif rom.endswith(".ram"):
+                    pass
             else:
                 print("Invalid filetype found")
+                
             if rom.endswith(".nes"):
                 found_nes_roms.append(rom)
             elif rom.endswith(".gb"):
@@ -77,9 +92,11 @@ def findroms():
 
                 if rom.endswith(".nes") or rom.endswith(".gb") or rom.endswith(".gbc") or rom.endswith(".nds") or rom.endswith(".z64"):
                     found_roms.append(str(rom))
-                
+                elif rom.endswith(".ram"):
+                    pass
                 else:
                     print("Invalid filetype found")
+
                 if rom.endswith(".nes"):
                     found_nes_roms.append(rom)
                 elif rom.endswith(".gb"):
@@ -138,12 +155,6 @@ Other options:
     [X] Exit
 """
 
-nesemu = False
-gbemu = False
-gbcemu = False
-ndsemu = False
-n64emu = False
-
 foundroms, foundnesroms, foundgbroms, foundgbcroms, foundndsroms, foundn64roms = findroms()
 print(menu)
 running = True
@@ -151,7 +162,6 @@ print("Detected roms:")
 for rm in foundroms:
         print("     - " + rm)
 while running == True:
-    #print(foundn64roms, foundndsroms, foundnesroms, foundgbcroms, foundgbroms, foundroms)
     print(optn)
     choice = input("\n\nEnter Selection: ")
     if choice == "1":
@@ -202,7 +212,11 @@ while running == True:
             print("     - " + rm)
         print(f"Found {str(len(foundroms))} roms!")
     elif choice.lower() == "c":
-        pass # change romdir
+        newromdir = input("Input new rom directory: ")
+        if os.path.exists(newromdir):
+            config["romdir"] = newromdir
+            with open("config.json", "w") as f:
+                json.dump(config, f, indent=4)
     elif choice.lower() == "d":
         reset_config()
         with open("config.json", "r") as f:
@@ -213,12 +227,18 @@ while running == True:
         print(f"Version: {config['version']}")
     elif choice.lower() == "s":
         print("Current settings:")
+        print(f"Rom directory: {config['romdir']}")
+        print(f"Automatic updates: {config['autoupd']}")
     elif choice.lower() == "u":
         if not os.path.exists("./updater.py"):
             updater = requests.get("https://raw.githubusercontent.com/bazthedev/PythonEmulatorsLauncher/main/updater.py")
             with open("./updater.py", "wb") as f:
                 f.write(updater.content)
                 f.close()
+            print("Please run the updater.py file to update the app.")
+            print("If you are having trouble with the updater, delete updater.py, choose the U option in the menu and it will download the latest updater.")
     elif choice.lower() == "x":
         print("Exitting...")
         break
+
+    print("\n")
