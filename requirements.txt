@@ -1,0 +1,10 @@
+py-desmume
+pyboy
+pyntendo
+cython
+numpy
+pygame
+pyaudio
+PyQt5
+PySDL2
+requests
