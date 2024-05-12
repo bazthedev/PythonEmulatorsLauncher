@@ -14,6 +14,7 @@ def reset_config():
         conf["version"] = "0.0.0"
         conf["romdir"] = "./roms"
         conf["autoupd"] = aupd
+        conf["bypass_config_check"] = False
         conf["foundroms"] = []
         conf["foundnesroms"] = []
         conf["foundgbroms"] = []
