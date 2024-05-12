@@ -4,7 +4,7 @@ import json
 import os
 
 def reset_config():
-    autoupd = input("Would you like to enable automatic updates? (y/n)")
+    autoupd = input("Would you like to enable automatic updates? (y/n) ")
     if autoupd[0].lower() == "y":
         aupd = True
     else:
@@ -27,6 +27,9 @@ try:
         config = json.load(f)
 except Exception:
     reset_config()
+finally:
+    with open("./config.json", "r") as f:
+        config = json.load(f)
 
 cver = config["version"]
 
@@ -70,6 +73,6 @@ def update(version : str):
         os.remove(f"./PEL_{version}.zip")
         print("Successfully updated!")
     else:
-        return False
+        print(f"You are already running the latest version!\nVersion: {version}")
     
 update(new_ver_str)
