@@ -9,7 +9,7 @@ import os
 import json
 
 
-
+config_options = ["version", "romdir", "autoupd", "bypass_config_check", "foundroms", "foundnesroms", "foundgbroms", "foundgbcroms", "foundndsroms", "foundn64roms"]
 
 def clear_scr():
     os.system("cls")
@@ -22,9 +22,10 @@ def reset_config():
         aupd = False
     with open("config.json", "w") as f:
         conf = {}
-        conf["version"] = "0.0.3"
+        conf["version"] = "0.0.4"
         conf["romdir"] = "./roms"
         conf["autoupd"] = aupd
+        conf["bypass_config_check"] = False
         conf["foundroms"] = []
         conf["foundnesroms"] = []
         conf["foundgbroms"] = []
@@ -60,6 +61,18 @@ if config["autoupd"] and check_update():
 else:
     print(f"You are already running the latest version!\nVersion: {config['version']}")
 
+def config_check(config : dict):
+    corrupt = False
+    for option in config_options:
+        if (option not in config_options) or (option in config_options and (option not in config)):
+            corrupt = True
+    if corrupt:
+        reset_conf_chk = input("Config seems to be corrupt, would you like to reset?\nMake sure you make a backup of your config incase you forget your settings.\n\ny/n: ")
+        if reset_conf_chk.lower() == "y":
+            reset_config()
+            print("Config has been reset")
+        else:
+            print("Config has not been reset")
 
 romdir = config["romdir"]
 
@@ -193,9 +206,16 @@ Other options:
     [D] Reset Config File to Default Options
     [I] View Information about this Program
     [S] View Current Config
+    [BCC] Bypass Config Check
+    [B] Backup Config
     [U] Update the App
     [X] Exit
 """
+try:
+    if not config["bypass_config_check"]:
+        config_check(config)
+except Exception:
+    config_check(config)
 
 foundroms, foundnesroms, foundgbroms, foundgbcroms, foundndsroms, foundn64roms = findroms(romdir, update_config)
 print(menu)
@@ -288,6 +308,23 @@ while running == True:
         print("Current settings:")
         print(f"Rom directory: {config['romdir']}")
         print(f"Automatic updates: {config['autoupd']}")
+    elif choice.lower() == "b":
+        pass # backup config
+    elif choice.lower() == "bcc":
+        if config["bypass_config_check"] == True:
+            bccchk = input("Would you like to turn on config check bypassing?\ny/n: ")
+            if bccchk.lower() == "y":
+                config["bypass_config_check"] = True
+                with open("config.json", "w") as f:
+                    json.dump(config, f, indent=4)
+                print("Bypassing enabled!")
+        else:
+            bccchk = input("Would you like to turn off config check bypassing?\ny/n: ")
+            if bccchk.lower() == "y":
+                config["bypass_config_check"] = False
+                with open("config.json", "w") as f:
+                    json.dump(config, f, indent=4)
+                print("Bypassing disabled!")
     elif choice.lower() == "u":
         if not os.path.exists("./updater.py"):
             updater = requests.get("https://raw.githubusercontent.com/bazthedev/PythonEmulatorsLauncher/main/updater.py")
