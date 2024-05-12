@@ -75,4 +75,5 @@ def update(version : str):
     else:
         print(f"You are already running the latest version!\nVersion: {version}")
     
-update(new_ver_str)
+if __name__ == "__main__":
+    update(new_ver_str)
