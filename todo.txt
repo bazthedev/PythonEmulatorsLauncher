@@ -1,3 +1,5 @@
 Add M64Py support
 Add PyGBA support
 Add Kaiser (Genesis Emulator)
+Make the updater contain config_check function
+The updater needs to be downloaded if config.json does not exist, as if updater.py does not exists, it cannot import check_update
