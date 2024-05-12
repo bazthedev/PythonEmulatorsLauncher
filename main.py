@@ -44,11 +44,6 @@ with open("config.json", "r") as f:
         config = json.load(f)
         loaded_config = True
 
-def reload_config():
-    f.close()
-    with open("./config.json", "r") as f:
-        config = json.load(f)
-    return config
 
 if not os.path.exists("./roms") and config["romdir"] == "./roms":
     os.mkdir("./roms")
@@ -62,6 +57,9 @@ if not os.path.exists("./updater.py"):
 
 if config["autoupd"] and check_update():
         print("Update found, please run updater.py")
+else:
+    print(f"You are already running the latest version!\nVersion: {config['version']}")
+
 
 romdir = config["romdir"]
 
