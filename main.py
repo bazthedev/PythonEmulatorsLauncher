@@ -22,7 +22,7 @@ def reset_config():
         aupd = False
     with open("config.json", "w") as f:
         conf = {}
-        conf["version"] = "0.0.4"
+        conf["version"] = "0.0.5"
         conf["romdir"] = "./roms"
         conf["autoupd"] = aupd
         conf["bypass_config_check"] = False
@@ -208,6 +208,7 @@ Other options:
     [S] View Current Config
     [BCC] Bypass Config Check
     [B] Backup Config
+    [IB] Import Config Backup
     [U] Update the App
     [X] Exit
 """
@@ -309,7 +310,24 @@ while running == True:
         print(f"Rom directory: {config['romdir']}")
         print(f"Automatic updates: {config['autoupd']}")
     elif choice.lower() == "b":
-        pass # backup config
+        if os.path.exists("config.json.bak"):
+            print("Backup already exists, proceeding will overwrite the old backup.")
+        c = input("Type y to continue: ")
+        if c.lower() == "y":
+            with open("config.json.bak", "w") as cb:
+                json.dump(config, cb, indent=4)
+        else:
+            continue
+    elif choice.lower() == "ib":
+        if not os.path.exists("config.json.bak"):
+            print("Backup not found")
+            continue
+        c = input("Type y to import backup: ")
+        if c.lower() == "y":
+            with open("config.json.bak", "r") as bc:
+                backup_conf = json.load(bc)
+            with open("config.json", "w") as f:
+                json.dump(backup_conf, f, indent=4)
     elif choice.lower() == "bcc":
         if config["bypass_config_check"] == True:
             bccchk = input("Would you like to turn on config check bypassing?\ny/n: ")
@@ -326,13 +344,12 @@ while running == True:
                     json.dump(config, f, indent=4)
                 print("Bypassing disabled!")
     elif choice.lower() == "u":
-        if not os.path.exists("./updater.py"):
             updater = requests.get("https://raw.githubusercontent.com/bazthedev/PythonEmulatorsLauncher/main/updater.py")
             with open("./updater.py", "wb") as f:
                 f.write(updater.content)
                 f.close()
-        print("Please run the updater.py file to update the app.")
-        print("If you are having trouble with the updater, delete updater.py, choose the U option in the menu and it will download the latest updater.")
+            print("Please run the updater.py file to update the app.")
+            print("If you are having trouble with the updater, delete updater.py, choose the U option in the menu and it will download the latest updater.")
     elif choice.lower() == "x":
         print("Exitting...")
         break
